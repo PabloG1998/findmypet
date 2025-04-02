@@ -3,7 +3,7 @@
    <head>
         <meta charset='UTF-8'>
         <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-        <title>Bienvenido - Juan Carlos</title>
+        <title>Bienvenido - Pablo Nicolas</title>
         <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css' rel='stylesheet'>
    </head>
    <body>
@@ -17,6 +17,7 @@
                 <ul class='navbar-nav ms-auto'>
                     <li class='nav-item'><a class='nav-link' href='#'>Inicio</a></li>
                     <li class='nav-item'><a class='nav-link' href='#'>Perfil</a></li>
+                    <li class='nav-item'><a class='nav-link' href='#'>Agregar Mascota</a></li> 
                     <li class='nav-item'><a class='nav-link' href='logout.php'>Cerrar Sesión</a></li>
                 </ul>
             </div>
@@ -25,14 +26,17 @@
 
     <div class='container mt-5'>
         <div class='card shadow p-4'>
-            <h1 class='text-center'>Bienvenido, Juan Carlos Riggiotti</h1>
-            <p class='text-center'>Este es su perfil como <strong>Dueño</strong></p>
-            <p class='text-center'><strong>Email: </strong> jcrig@gmail.com</p>
+            <h1 class='text-center'>Bienvenido, Pablo Nicolas Garcai</h1>
+            <p class='text-center'>Este es su perfil como <strong>Adoptante</strong></p>
+            <p class='text-center'><strong>Email: </strong> pablogarciag21@gmail.com</p>
         </div>
+        <form action=''>
+            <button>Hola Mundo</button>
+        </form>
     </div>
 
     <footer class='bg-dark text-light text-center py-3 mt-5'>
-        <p>&copy; 2025 FindMyPet. Todos los derechos reservados.</p>
+        <p>&copy; 2025 <a href='https://pablonicolasgarcia.infinityfreeapp.com' target='blank'> Pablo Nicoals Garcia @ FindMyPet. Todos los derechos reservados.</p>
     </footer>
 
     <script src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js'></script>

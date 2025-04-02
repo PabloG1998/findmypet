@@ -3,7 +3,7 @@
    <head>
         <meta charset='UTF-8'>
         <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-        <title>Bienvenido - Juan Carlos</title>
+        <title>Bienvenido - Roberto Luis</title>
         <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css' rel='stylesheet'>
    </head>
    <body>
@@ -17,6 +17,7 @@
                 <ul class='navbar-nav ms-auto'>
                     <li class='nav-item'><a class='nav-link' href='#'>Inicio</a></li>
                     <li class='nav-item'><a class='nav-link' href='#'>Perfil</a></li>
+                    <li class='nav-item'><a class='nav-link' href='#'>Agregar Mascota</a></li> 
                     <li class='nav-item'><a class='nav-link' href='logout.php'>Cerrar Sesión</a></li>
                 </ul>
             </div>
@@ -25,10 +26,13 @@
 
     <div class='container mt-5'>
         <div class='card shadow p-4'>
-            <h1 class='text-center'>Bienvenido, Juan Carlos Riggiotti</h1>
+            <h1 class='text-center'>Bienvenido, Roberto Luis Riconte</h1>
             <p class='text-center'>Este es su perfil como <strong>Dueño</strong></p>
-            <p class='text-center'><strong>Email: </strong> jcrig@gmail.com</p>
+            <p class='text-center'><strong>Email: </strong> rlricon@yahoo.com</p>
         </div>
+        <form action=''>
+            <button>Hola Mundo</button>
+        </form>
     </div>
 
     <footer class='bg-dark text-light text-center py-3 mt-5'>

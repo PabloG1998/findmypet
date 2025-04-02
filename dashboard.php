@@ -1,11 +1,15 @@
-<?php
-session_start();
+<?php 
+// Inicia la sesión si no está iniciada
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
 $host = 'localhost';
 $user = 'root';
 $password = '';
 $dbname = 'findmypet';
 
-// Verifica la autenticación
+// Verificación de autenticación
 if (!isset($_SESSION['user_id'])) {
     header("Location: ./login.php");
     exit();
@@ -13,105 +17,105 @@ if (!isset($_SESSION['user_id'])) {
 
 $conn = new mysqli($host, $user, $password, $dbname);
 if ($conn->connect_error) {
-    die("Conexión fallida: " . $conn->connect_error);
+    die("Connection failed: " . $conn->connect_error);
 }
 
-// Obtención de datos del usuario
+// Obtención de los datos del usuario
 $user_id = $_SESSION['user_id'];
 $stmt = $conn->prepare("SELECT nombre, apellido, LOWER(email) AS email, UPPER(pais) AS pais, LOWER(tipo_usuario) AS tipo_usuario FROM usuarios WHERE id = ?");
 if (!$stmt) {
-    die("Error en la consulta: " . $conn->error);
+   die("Query Failure: " . $conn->error);
 }
 
 $stmt->bind_param('i', $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
+$stmt->close();
+$conn->close();
 
 if (!$user) {
-    die("Error: Usuario no encontrado.");
+    die("Error: User not found");
 }
 
 $pais = $user['pais'];
 $tipo_usuario = $user['tipo_usuario'];
-$email = strtolower($user['email']); // Se usará como nombre de carpeta
-$email_folder = preg_replace('/[^a-zA-Z0-9._-]/', '_', $email); // Sanitiza el nombre del directorio
+$email_folder = preg_replace('/[^a-zA-Z0-9._-]/', '_', strtolower($user['email']));
 
-// Listado de países y tipos de usuario válidos
-$paises_validos = ['ARG', 'BOL', 'BRA', 'CHL', 'COL', 'COR', 'CUB', 'ECU', 'COS', 'REP', 'ELS', 'GUA', 'GUY', 'HON', 'JAM', 'MEX', 'NIC', 'PAN', 'PAR', 'URU', 'VEN'];
-$tipo_usuario_validos = ['dueño', 'rescatista', 'adoptante'];
+// Listado de países y usuarios válidos
+$paises_validos = ["ARG", "BOL", "BRA", "CHL", "COL", "COR", "CUB", "COS", "REP", "ELS", "GUA", "GUY", "HON", "JAM", "MEX", "NIC", "PAN", "PAR", "URU", "VEN"];
+$tipo_usuario_validos = ["dueño", "rescatista", "adoptante"];
 
-if (in_array($pais, $paises_validos) && in_array($tipo_usuario, $tipo_usuario_validos)) {
-    // Ruta dinámica basada en email
-    $base_dir = "countries/" . $pais . "/" . $tipo_usuario;
-    $user_folder = $base_dir . "/" . $email_folder; // Usa el email como nombre de directorio
-
-    if (!file_exists($user_folder)) {
-        mkdir($user_folder, 0777, true);
-    }
-
-    $user_dashboard_path = $user_folder . "/index.php";
-
-    // Verifica si ya existe el archivo index.php para el usuario
-    if (!file_exists($user_dashboard_path)) {
-        $index_file_content = generate_dashboard_content($user, $tipo_usuario);
-        file_put_contents($user_dashboard_path, $index_file_content);
-    }
-
-    header("Location: " . $user_dashboard_path);
-    exit();
-} else {
-    die("Error: País o rol no válidos.");
+if (!in_array($pais, $paises_validos) || !in_array($tipo_usuario, $tipo_usuario_validos)) {
+    die("Error: Pais o rol no válidos");
 }
 
-$conn->close();
+// Construcción del path
+$base_dir = "countries/$pais/$tipo_usuario";
+$user_folder = "$base_dir/$email_folder";
+$user_dashboard_path = "$user_folder/index.php";
 
-/**
- * Genera el contenido del archivo index.php para el usuario.
- */
+// Si la carpeta no existe, se crea
+if (!file_exists($user_folder)) {
+    mkdir($user_folder, 0777, true);
+}
+
+// Generación dinámica del dashboard si no existe
+if (!file_exists($user_dashboard_path)) {
+    file_put_contents($user_dashboard_path, generate_dashboard_content($user, $tipo_usuario));
+}
+if (!file_exists($user_dashboard_path)) {
+    die("Error: El archivo no se generó correctamente");
+}
+
+// Redirección al dashboard según usuario
+header("Location: $user_dashboard_path");
+exit();
+
 function generate_dashboard_content($user, $tipo_usuario) {
-    $contenido = "<!DOCTYPE html>
-<html lang='es'>
-<head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>Bienvenido - " . htmlspecialchars($user['nombre']) . "</title>
-    <!-- Aquí va el CSS para el navbar -->
-    <link rel='stylesheet' href='navbar.css'>
-</head>
-<body>
-    <header>
-        <nav class='navbar'>
-            <ul class='navbar-nav'>
-                <li><a href='#'>Inicio</a></li>
-                <li><a href='#'>Perfil</a></li>
-                <li><a href='#'>Mis Mascotas</a></li>
-                <li><a href='#'>Cerrar sesión</a></li>
-            </ul>
-        </nav>
-    </header>
+   return "<!DOCTYPE html>
+   <html lang='es'>
+   <head>
+        <meta charset='UTF-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+        <title>Bienvenido - " . htmlspecialchars($user['nombre']) . "</title>
+        <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css' rel='stylesheet'>
+   </head>
+   <body>
+    <nav class='navbar navbar-expand-lg navbar-dark bg-dark'>
+        <div class='container'>
+            <a class='navbar-brand' href='#'>FindMyPet</a>
+            <button class='navbar-toggler' type='button' data-bs-toggle='collapse' data-bs-target='#navbarNav'>
+                <span class='navbar-toggler-icon'></span>
+            </button>
+            <div class='collapse navbar-collapse' id='navbarNav'>
+                <ul class='navbar-nav ms-auto'>
+                    <li class='nav-item'><a class='nav-link' href='#'>Inicio</a></li>
+                    <li class='nav-item'><a class='nav-link' href='#'>Perfil</a></li>
+                    <li class='nav-item'><a class='nav-link' href='#'>Agregar Mascota</a></li> 
+                    <li class='nav-item'><a class='nav-link' href='logout.php'>Cerrar Sesión</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-    <div class='container'>
-        <h1>Bienvenido, " . htmlspecialchars($user['nombre']) . " " . htmlspecialchars($user['apellido']) . "</h1>
-        <p>Este es tu perfil como <strong>" . ucfirst($tipo_usuario) . "</strong></p>
-        <p><strong>Email:</strong> " . htmlspecialchars($user['email']) . "</p>";
+    <div class='container mt-5'>
+        <div class='card shadow p-4'>
+            <h1 class='text-center'>Bienvenido, " . htmlspecialchars($user['nombre']) . " " . htmlspecialchars($user['apellido']) . "</h1>
+            <p class='text-center'>Este es su perfil como <strong>" . ucfirst($tipo_usuario) . "</strong></p>
+            <p class='text-center'><strong>Email: </strong> " . htmlspecialchars($user['email']) . "</p>
+        </div>
+        <form action=''>
+            <button>Hola Mundo</button>
+        </form>
+    </div>
 
-    switch ($tipo_usuario) {
-        case 'dueño':
-            $contenido .= "<h3>Gestión de Mascotas</h3><p>Ver y administrar tus mascotas.</p>";
-            break;
-        case 'rescatista':
-            $contenido .= "<h3>Gestión de Rescates</h3><p>Visualiza tus rescates realizados.</p>";
-            break;
-        case 'adoptante':
-            $contenido .= "<h3>Gestión de Adopciones</h3><p>Solicitar adopciones o ver tus adopciones anteriores.</p>";
-            break;
-    }
+    <footer class='bg-dark text-light text-center py-3 mt-5'>
+        <p>&copy; " . date('Y') . " <a href='https://pablonicolasgarcia.infinityfreeapp.com' target='blank'> Pablo Nicoals Garcia @ FindMyPet. Todos los derechos reservados.</p>
+    </footer>
 
-    $contenido .= "</div>
-</body>
-</html>";
-
-    return $contenido;
+    <script src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js'></script>
+   </body>
+   </html>";
 }
 ?>
