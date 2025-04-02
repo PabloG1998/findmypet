@@ -38,9 +38,10 @@
     </div>
 
     </nav>
-<h1>Bienvenido Rescatista</h1>
-
-        <p>Aquí puedes gestionar reportes de mascotas perdidas.</p>
-        <a class='btn btn-danger' href='#'> Emitir una alerta</a>
+<h1>Bienvenido Dueño</h1>
+<p>Aquí puedes ver el estado de tus mascotas registradas.</p>
+        <a class='btn btn-success' href='#'>Ver mis mascotas'>
+        <br>
+        <a class='btn btn-danger' href='#'>Emitir una alerta Rescatistas</a>
 </body>
 </html>

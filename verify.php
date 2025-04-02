@@ -53,7 +53,10 @@ if (!is_dir($base_path)) {
 //$usuario_array["rescastista", "dueño", "adoptante"];
 $index_path = "$base_path/index.php";
 if (!file_exists($index_path)) {
-    $index_content = "<!DOCTYPE html>\n<html lang='es'>\n<head>\n<meta charset='UTF-8'>\n<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n<title>Dashboard</title>\n";
+    $index_content = "<!DOCTYPE html>\n<html lang='es'>
+    \n<head>\n
+    <meta charset='UTF-8'>\n
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>\n<title>Dashboard</title>\n";
     $index_content .= "<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css'>\n</head>\n<body>\n";
     $index_content .= "<nav class='navbar navbar-expand-lg navbar-light bg-light'>
     \n<div class='container-fluid'>
@@ -74,13 +77,20 @@ if (!file_exists($index_path)) {
     if ($tipo_usuario == 'rescatista') {
 
         $index_content .= "<h1>Bienvenido Rescatista</h1>\n
-        <p>Aquí puedes gestionar reportes de mascotas perdidas.</p>\n";
+        <p>Aquí puedes gestionar reportes de mascotas perdidas.</p>
+        <a class='btn btn-danger' href='#'> Emitir una alerta</a>\n";
+        
     } elseif ($tipo_usuario == 'dueño') {
 
-        $index_content .= "<h1>Bienvenido Dueño</h1>\n<p>Aquí puedes ver el estado de tus mascotas registradas.</p>\n";
+        $index_content .= "<h1>Bienvenido Dueño</h1>\n<p>Aquí puedes ver el estado de tus mascotas registradas.</p>
+        <a class='btn btn-success' href='#'>Ver mis mascotas'</a>
+        <br>
+        <a class='btn btn-danger' href='#'>Emitir una alerta Rescatistas</a>\n";
     } elseif ($tipo_usuario == 'adoptante') {
 
-        $index_content .= "<h1>Bienvenido Adoptante</h1>\n<p>Aquí puedes buscar mascotas disponibles para adopción.</p>\n";
+        $index_content .= "<h1>Bienvenido Adoptante</h1>\n<p>Aquí puedes buscar mascotas disponibles para adopción.</p>
+        <a class='btn btn-success' href='#'>Ver animales en adopcion</a>\n
+        <a class='btn btn-success' href='#'Contactar con Rescatistas";
     }
 
     $index_content .= "</body>\n</html>";
