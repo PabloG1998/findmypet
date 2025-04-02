@@ -35,24 +35,27 @@
             // Dependiendo del tipo de usuario, creamos un index.php diferente
             switch ($tipo_usuario) {
                 case 'Dueño':
-                    $index_content = "<?php echo 'Bienvenido, dueño de mascota'; ?>";
+                    $index_content = "<?php echo 'Bienvenido, dueño de mascota, ya puede iniciar sesion <a href='login.php'; ?>";
                     break;
                 case 'Rescatista':
-                    $index_content = "<?php echo 'Bienvenido, rescatista de mascotas'; ?>";
+                    $index_content = "<?php echo 'Bienvenido, rescatista de mascotas, ya puede iniciar sesion <a href='login.php'; ?>";
                     break;
                 case 'Adoptante':
-                    $index_content = "<?php echo 'Bienvenido, adoptante de mascotas'; ?>";
+                    $index_content = "<?php echo 'Bienvenido, adoptante de mascotas, ya puede iniciar sesion <a href='login.php'; ?>";
                     break;
                 default:
                     $index_content = "<?php echo 'Bienvenido a tu perfil'; ?>";
                     break;
             }
+                    
             
             // Guardar el contenido del index.php en el directorio del usuario
             file_put_contents("$dir_path/index.php", $index_content);
             
             // Redirigir a la página del directorio correspondiente
-            header("Location: $dir_path/index.php");
+           // header("Location: $dir_path/index.php");
+           //Redirigir al login.php
+           header("Location: login.php");
             exit();
         } else {
             echo "Error al registrar usuario";
@@ -161,11 +164,10 @@
                 </select>
             </div>
             <button type="submit" class="btn btn-primary w-100">Registrarse</button>
-        
-?>
+ 
         </form>
     </div>
-
+  
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
