@@ -1,1 +1,0 @@
-<?php echo 'Bienvenido, adoptante de mascotas'; ?>

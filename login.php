@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $_SESSION['user_name'] = $row['nombre'];
 
                 // Redirigir al dashboard
-                header("Location: dashboard.php");
+                header("Location: verify.php");
                 exit();
             } else {
                 $error = "Credenciales incorrectas.";
