@@ -1,1 +1,0 @@
-<?php echo 'Bienvenido, rescatista de mascotas, ya puede iniciar sesion <a href='login.php'; ?>
