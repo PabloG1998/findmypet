@@ -1,5 +1,3 @@
-<?php
- //echo 'Bienvenido, dueño'; ?>
 <!DOCTYPE html>
 <html lang='es'>
 <head>
@@ -24,5 +22,7 @@
 </div>
 </div>
 </nav>
+<h1>Bienvenido Rescatista</h1>
+<p>Aquí puedes gestionar reportes de mascotas perdidas.</p>
 </body>
 </html>

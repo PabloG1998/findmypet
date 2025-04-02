@@ -49,15 +49,43 @@ if (!is_dir($base_path)) {
 }
 
 // Crear un index personalizado si no existe
+
+//$usuario_array["rescastista", "dueño", "adoptante"];
 $index_path = "$base_path/index.php";
 if (!file_exists($index_path)) {
-    $index_content; 
-    $index_content .= "<!DOCTYPE html>\n<html lang='es'>\n<head>\n<meta charset='UTF-8'>\n<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n<title>Dashboard</title>\n";
+    $index_content = "<!DOCTYPE html>\n<html lang='es'>\n<head>\n<meta charset='UTF-8'>\n<meta name='viewport' content='width=device-width, initial-scale=1.0'>\n<title>Dashboard</title>\n";
     $index_content .= "<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css'>\n</head>\n<body>\n";
-    $index_content .= "<nav class='navbar navbar-expand-lg navbar-light bg-light'>\n<div class='container-fluid'>\n<a class='navbar-brand' href='#'>Find My Pet</a>\n<button class='navbar-toggler' type='button' data-bs-toggle='collapse' data-bs-target='#navbarNav' aria-controls='navbarNav' aria-expanded='false' aria-label='Toggle navigation'>\n<span class='navbar-toggler-icon'></span>\n</button>\n<div class='collapse navbar-collapse' id='navbarNav'>\n<ul class='navbar-nav'>\n<li class='nav-item'><a class='nav-link' href='#'>Inicio</a></li>\n<li class='nav-item'><a class='nav-link' href='#'>Perfil</a></li>\n<li class='nav-item'><a class='nav-link' href='#'>Configuración</a></li>\n</ul>\n</div>\n</div>\n</nav>\n</body>\n</html>";
+    $index_content .= "<nav class='navbar navbar-expand-lg navbar-light bg-light'>
+    \n<div class='container-fluid'>
+    \n<a class='navbar-brand' href='#'>Find My Pet</a>
+    \n<button class='navbar-toggler' type='button' data-bs-toggle='collapse' data-bs-target='#navbarNav' aria-controls='navbarNav' aria-expanded='false' aria-label='Toggle navigation'>
+    \n<span class='navbar-toggler-icon'></span>\n
+    </button>\n<div class='collapse navbar-collapse' id='navbarNav'>\n<ul class='navbar-nav'>\n<li class='nav-item'>
+    <a class='nav-link' href='#'>Inicio</a>
+    </li>\n<li class='nav-item'><a class='nav-link' href='#'>Perfil</a>
+    </li>\n<li class='nav-item'><a class='nav-link' href='#'>Configuración</a>
+    </li>\n
+    </ul>\n
+    </div>\n
+    </div>\n
+    </nav>\n";
+
+    // Contenido personalizado según el tipo de usuario
+    if ($tipo_usuario == 'rescatista') {
+
+        $index_content .= "<h1>Bienvenido Rescatista</h1>\n
+        <p>Aquí puedes gestionar reportes de mascotas perdidas.</p>\n";
+    } elseif ($tipo_usuario == 'dueño') {
+
+        $index_content .= "<h1>Bienvenido Dueño</h1>\n<p>Aquí puedes ver el estado de tus mascotas registradas.</p>\n";
+    } elseif ($tipo_usuario == 'adoptante') {
+
+        $index_content .= "<h1>Bienvenido Adoptante</h1>\n<p>Aquí puedes buscar mascotas disponibles para adopción.</p>\n";
+    }
+
+    $index_content .= "</body>\n</html>";
     file_put_contents($index_path, $index_content);
 }
-
 // Redirigir al usuario a su carpeta correspondiente
 header("Location: $index_path");
 exit();
