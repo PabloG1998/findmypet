@@ -1,56 +1,57 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang='es'>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil de Usuario</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            text-align: center;
-            padding: 20px;
-        }
-        .perfil-container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            margin: auto;
-        }
-        input, button {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        button {
-            background-color: #007BFF;
-            color: white;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>Dashboard</title>
+<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css'>
 </head>
 <body>
+<nav class='navbar navbar-expand-lg navbar-light bg-light'>
+<div class='container-fluid'>
+<a class='navbar-brand' href='#'>Find My Pet</a>
+<button class='navbar-toggler' type='button' data-bs-toggle='collapse' data-bs-target='#navbarNav' aria-controls='navbarNav' aria-expanded='false' aria-label='Toggle navigation'>
+<span class='navbar-toggler-icon'></span>
+</button>
+<div class='collapse navbar-collapse' id='navbarNav'>
+<ul class='navbar-nav'>
+<li class='nav-item'><a class='nav-link' href='./index.php'>Inicio</a></li>
+<li class='nav-item'><a class='nav-link' href='./perfil.php'>Perfil</a></li>
+<li class='nav-item'><a class='nav-link' href='#'>Configuración</a></li>
+</ul>
+</div>
+</div>
+</nav>
 
-    <div class="perfil-container">
-        <h2>Perfil de Usuario</h2>
+    <div class="container vh-100 d-flex justify-content-center align-items-center">
+        
         <form action="update_profile.php" method="POST">
-            <label>Nombre:</label>
-            <input type="text" name="nombre" placeholder="Ingrese su nombre" required>
 
-            <label>Email:</label>
-            <input type="email" name="email" placeholder="Ingrese su email" required>
+            <div class="mb-3">
+                <label class="form-label">Nombre de la Mascota:</label>
+                <input class="form-control" type="text" name="nombre" placeholder="Ingrese su nombre" required>
+            </div>
 
-            <label>Contraseña:</label>
-            <input type="password" name="password" placeholder="Ingrese su contraseña" required>
+            <div class="mb-3">
+                <label class="form-label">Tipo de Mascota:</label>
+                <input class="form-control" type="text" name="tMascota" placeholder="PERRO, GATO">
+              </div>
 
-            <button type="submit">Actualizar Perfil</button>
+            <div class="mb-3">
+            <label class="form-label">Raza de la mascota</label>
+            <input class="form-control" type="text" name="" placeholder="Ingrese la raza" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Cantidad</label>
+            <input class="form-control" type="number" name="cMascota" placeholder="Ingrese la cantidad de mascotas">
+            
+        </div>
+            <div class="mb-3">
+                <label class="form-label">Foto de la mascota</label>
+                <input class="form-control" type="file" name="fMascota" id="fMascota">
+            </div>
+            <button class="btn btn-success" type="submit">Agregar Mascota</button>
         </form>
     </div>
 
