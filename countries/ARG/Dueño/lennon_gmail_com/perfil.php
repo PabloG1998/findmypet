@@ -1,32 +1,6 @@
     <?php 
-        require_once('../../../../db.php');
-        require_once('../../../../funciones.php');
-        
-        session_start();
-        $usuario_id = $_SESSION['id'];
-
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $nombre = $_POST['mNombre'];
-            $especie = $_POST['mMascota'];
-            $raza = $_POST['mRaza'];
-            $cantidad = intval($_POST['mCantidad']);
-            
-            // Manejo de la imagen
-            $foto_nombre = $_FILES['mFoto']['name'];
-            $foto_tmp = $_FILES['mFoto']['tmp_name'];
-            $foto_destino = "../../../../uploads/" . basename($foto_nombre);
-        
-            if (move_uploaded_file($foto_tmp, $foto_destino)) {
-                if (addPet($conexion, $usuario_id, $nombre, $especie, $raza, $cantidad, $foto_destino)) {
-                    echo "<script>alert('Mascota agregada con éxito');</script>";
-                } else {
-                    echo "<script>alert('Error al agregar la mascota');</script>";
-                }
-            } else {
-                echo "<script>alert('Error al subir la imagen');</script>";
-            }
-        }
-        ?>   
+    require_once('../../../../db.php');
+    ?>     
    
     
 <!DOCTYPE html>
