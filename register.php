@@ -2,6 +2,7 @@
 require_once('config/Database.php');
 $database = new Database();
 $conn = $database->getConnection();
+require_once('config/funciones.php');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nombre_completo = trim($_POST['nombre_completo']);
@@ -35,6 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         // Normalizar el email para el nombre de carpeta
         $email_dir = preg_replace("/[^a-zA-Z0-9]/", "_", $email);
+
         $dir_path = "countries/$pais/$tipo_usuario/$email_dir";
 
         // Crear directorio si no existe
@@ -42,6 +44,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             mkdir($dir_path, 0777, true);
         }
 
+        //Generacion dinámica de contenido
+        $indexContent = <<<PHP
+        <?php 
+        session_start();
+        echo "<h1>Bienvenido, $email</h1>";
+        echo "<p>Rol: $tipo_usuario</p>";
+        echo "<p>País: $pais</p>";
+
+        switch('$tipo_usuario') {
+        case 'adoptante':
+            echo "<p>Ver mascotas disponibles</p>";
+            break;
+        case 'rescatista':
+            echo "<p>Ver alertas recientes</p>";
+            break;
+        case 'transito':
+            echo "<p>Ver mascotas asignadas a tu cuidado</p>";
+             break;
+        }
+    ?>
+    PHP;
+        file_put_contents("$dir_path/index.php", $indexContent);
         
         header("refresh:2; url=login.php"); // Redirigir después de 2 segundos
         exit;

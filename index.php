@@ -1,6 +1,6 @@
 <?php 
 require_once('config/Database.php');
-$database  = new Database();
+$database = new Database();
 $conn = $database->getConnection();
 ?>
 
