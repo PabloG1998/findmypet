@@ -33,8 +33,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $dir_path = crearCarpetaUsuario($pais, $tipo_usuario, $email);
         $indexContent = generateIndex($email, $tipo_usuario, $pais);
         $profileContent = generateProfile($nombre_completo, $apellido, $email, $tipo_usuario, $pais);
+        $petContent = generatePetForm($email, $tipo_usuario, $pais);
         file_put_contents("$dir_path/index.php", $indexContent);
         file_put_contents("$dir_path/perfil.php", $profileContent);
+        file_put_contents("$dir_path/misMascotas.php", $petContent);
+        
 
         header("refresh:2; url=login.php");
         exit;
@@ -54,24 +57,41 @@ function crearCarpetaUsuario($pais, $tipo_usuario, $email) {
     return $dir_path;
 }
 
+function crearCarpetaImg() {
+  $dirPathImg = "countries/$pais/$tipo_usuario/$email_dir";
+  if (!file_exists($dirPathImg)) {
+    mkdir($dirPathImg, 0777, true);
+  }
+  return $dirPathImg;
+}
+
 function generateIndex($email, $tipo_usuario, $pais) {
     $menuItems = '';
 
     switch ($tipo_usuario) {
         case 'Dueño':
-            $menuItems = '<li class="nav-item"><a class="nav-link" href="#">Mis Mascotas</a></li><li class="nav-item"><a class="nav-link" href="#">Veterinarios</a></li><li class="nav-item"><a class="nav-link" href="#">Reportar Perdida</a></li>';
+            $menuItems = '<li class="nav-item"><a class="nav-link" href="misMascotas.php">Mis Mascotas</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Veterinarios</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Reportar Perdida</a></li>';
             break;
         case 'Adoptante':
-            $menuItems = '<li class="nav-item"><a class="nav-link" href="#">Mascotas Disponibles</a></li><li class="nav-item"><a class="nav-link" href="#">Mi historial de Adopci\u00f3n</a></li><li class="nav-item"><a class="nav-link" href="#">Veterinarios</a></li>';
+            $menuItems = '<li class="nav-item"><a class="nav-link" href="#">Mascotas Disponibles</a>
+            </li><li class="nav-item"><a class="nav-link" href="#">Mi historial de Adopcion</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Veterinarios</a></li>';
             break;
         case 'Rescatista':
-            $menuItems = '<li class="nav-item"><a class="nav-link" href="#">Registrar Rescate</a></li><li class="nav-item"><a class="nav-link" href="#">Lista de Mascotas Rescatadas</a></li><li class="nav-item"><a class="nav-link" href="#">Veterinarios</a></li>';
+            $menuItems = '<li class="nav-item"><a class="nav-link" href="#">Registrar Rescate</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Lista de Mascotas Rescatadas</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Veterinarios</a></li>';
             break;
         case 'Transito':
-            $menuItems = '<li class="nav-item"><a class="nav-link" href="#">Mascotas en Tr\u00e1nsito</a></li><li class="nav-item"><a class="nav-link" href="#">Solicitudes de Adopci\u00f3n</a></li><li class="nav-item"><a class="nav-link" href="#">Veterinarios</a></li>';
+            $menuItems = '<li class="nav-item"><a class="nav-link" href="#">Mascotas en Tránsito</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Solicitudes de Adopcion</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Veterinarios</a></li>';
             break;
         default:
-            $menuItems = '<li class="nav-item"><a class="nav-link" href="#">Inicio</a></li>';
+            $menuItems = '<li class="nav-item">
+            <a class="nav-link" href="#">Inicio</a></li>';
             break;
     }
 
@@ -99,7 +119,7 @@ function generateIndex($email, $tipo_usuario, $pais) {
 </nav>
 <div class="container mt-4">
   <h1>Bienvenido, $tipo_usuario</h1>
-  <p>Aqu\u00ed puedes comenzar a gestionar tus actividades.</p>
+  <p>Banco de Datos - Mascotas</p>
 </div>
 </body>
 </html>
@@ -135,7 +155,7 @@ function generateProfile($nombre_completo, $apellido, $email, $tipo_usuario, $pa
           <a class="nav-link" href="mis_mascotas.php"> Mis Mascotas</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="logout.php">Cerrar Sesi\u00f3n</a>
+            <a class="nav-link" href="logout.php">Cerrar Sesion</a>
         </li>
     </ul>
       <span class="navbar-text">
@@ -149,6 +169,13 @@ function generateProfile($nombre_completo, $apellido, $email, $tipo_usuario, $pa
 </html>
 HTML;
 }
+
+//Crear la función
+function generatePetForm($email, $tipo_usuario, $pais) {
+   return null;
+    
+}
+
 ?>
 
 
