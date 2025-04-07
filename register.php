@@ -31,8 +31,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($stmt->execute([$nombre_completo, $apellido, $email, $password, $pais, $provincia_estado, $direccion, $telefono, $tipo_usuario])) {
 
         $dir_path = crearCarpetaUsuario($pais, $tipo_usuario, $email);
-        $indexContent = generarIndexPorRol($email, $tipo_usuario, $pais);
+        $indexContent = generateIndex($email, $tipo_usuario, $pais);
+        $profileContent = generateProfile($nombre_completo, $apellido, $email, $tipo_usuario, $pais);
         file_put_contents("$dir_path/index.php", $indexContent);
+        file_put_contents("$dir_path/perfil.php", $profileContent);
 
         header("refresh:2; url=login.php");
         exit;
@@ -41,7 +43,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Función para crear carpeta del usuario
 function crearCarpetaUsuario($pais, $tipo_usuario, $email) {
     $email_dir = preg_replace("/[^a-zA-Z0-9]/", "_", $email);
     $dir_path = "countries/$pais/$tipo_usuario/$email_dir";
@@ -53,93 +54,59 @@ function crearCarpetaUsuario($pais, $tipo_usuario, $email) {
     return $dir_path;
 }
 
-// Función para generar index.php con menú bootstrap
 function generateIndex($email, $tipo_usuario, $pais) {
-      $menuItems = '';
-      switch ($tipo_usuario) {
+    $menuItems = '';
+
+    switch ($tipo_usuario) {
         case 'Dueño':
-          $menuItems = '
-              <li class="nav-item"><a class="nav-link" href="#">Mis Mascotas</a></li>
-              <li class="nav-item"><a class="nav-link" href="#">Veterinarios</a></li>
-              <li class="nav-item"><a class="nav-link" href="#">Reportar Perdida</a></li>
-          ';
-          break;
+            $menuItems = '<li class="nav-item"><a class="nav-link" href="#">Mis Mascotas</a></li><li class="nav-item"><a class="nav-link" href="#">Veterinarios</a></li><li class="nav-item"><a class="nav-link" href="#">Reportar Perdida</a></li>';
+            break;
         case 'Adoptante':
-          $menuItems = '
-            <li class="nav-item"><a class="nav-link" href="#">Mascotas Disponibles</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">Mi historial de Adopción</a></li>
-          ';
-          break;
+            $menuItems = '<li class="nav-item"><a class="nav-link" href="#">Mascotas Disponibles</a></li><li class="nav-item"><a class="nav-link" href="#">Mi historial de Adopci\u00f3n</a></li><li class="nav-item"><a class="nav-link" href="#">Veterinarios</a></li>';
+            break;
         case 'Rescatista':
-          $menuItems = '
-             <li class="nav-item"><a class="nav-link" href="#">Registar Rescate</a></li>
-             <li class="nav-item"><a class="nav-link" href="#">Lista de mascotas Rescatadas</a></li>
-          ';
+            $menuItems = '<li class="nav-item"><a class="nav-link" href="#">Registrar Rescate</a></li><li class="nav-item"><a class="nav-link" href="#">Lista de Mascotas Rescatadas</a></li><li class="nav-item"><a class="nav-link" href="#">Veterinarios</a></li>';
+            break;
         case 'Transito':
-          $menuItems = '
-            <li class="nav-item"><a class="nav-link" href="#">Mascotas en Tránsito</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">Solicitudes de Adopcion</a></li>
-          ';
-        break;
-        
+            $menuItems = '<li class="nav-item"><a class="nav-link" href="#">Mascotas en Tr\u00e1nsito</a></li><li class="nav-item"><a class="nav-link" href="#">Solicitudes de Adopci\u00f3n</a></li><li class="nav-item"><a class="nav-link" href="#">Veterinarios</a></li>';
+            break;
         default:
-          $menuItems = '
-            <li class="nav-item"><a class="nav-link" href="#">Inicio</a></li> 
-          ';
-          break;
-      }
+            $menuItems = '<li class="nav-item"><a class="nav-link" href="#">Inicio</a></li>';
+            break;
+    }
 
     return <<<HTML
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Bienvenido - $nombre_completo, $apellido</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>Inicio</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Find My Pet</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-  
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav me-auto">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Inicio</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="perfil.php">Perfil</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="mis_mascotas.php">Mascotas</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="logout.php">Cerrar Sesion</a>
-        </li>
-    </ul>
-      <span class="navbar-text">
-        $email ($tipo_usuario - $pais)
-      </span>
-    </div>
+      <a class="navbar-brand" href="#">FindMyPet</a>
+      <div class="collapse navbar-collapse">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              $menuItems
+          </ul>
+          <span class="navbar-text">
+              $email - $tipo_usuario - $pais
+          </span>
+      </div>
   </div>
 </nav>
-
-<div class="container mt-5">
-    <h1 class="text-center">Bienvenido, $tipo_usuario</h1>
-    <p class="text-center">Aquí podrás gestionar tus mascotas, adoptar, rescatar o brindar tránsito, según tu rol.</p>
+<div class="container mt-4">
+  <h1>Bienvenido, $tipo_usuario</h1>
+  <p>Aqu\u00ed puedes comenzar a gestionar tus actividades.</p>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 HTML;
 }
 
-//Función para crear el perfil
-function generateProfile() {
+function generateProfile($nombre_completo, $apellido, $email, $tipo_usuario, $pais) {
     return <<<HTML
     <!DOCTYPE html>
 <html lang="es">
@@ -155,7 +122,7 @@ function generateProfile() {
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
-  
+
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav me-auto">
         <li class="nav-item">
@@ -168,7 +135,7 @@ function generateProfile() {
           <a class="nav-link" href="mis_mascotas.php"> Mis Mascotas</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="logout.php">Cerrar Sesion</a>
+            <a class="nav-link" href="logout.php">Cerrar Sesi\u00f3n</a>
         </li>
     </ul>
       <span class="navbar-text">
@@ -177,17 +144,13 @@ function generateProfile() {
     </div>
   </div>
 </nav>
-
-
-
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 HTML;
-
 }
 ?>
+
 
 
 
