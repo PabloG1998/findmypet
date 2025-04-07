@@ -34,9 +34,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $indexContent = generateIndex($email, $tipo_usuario, $pais);
         $profileContent = generateProfile($nombre_completo, $apellido, $email, $tipo_usuario, $pais);
         $petContent = generatePetForm($email, $tipo_usuario, $pais);
+        $veterinarioContent = generateVeterinario();
         file_put_contents("$dir_path/index.php", $indexContent);
         file_put_contents("$dir_path/perfil.php", $profileContent);
         file_put_contents("$dir_path/misMascotas.php", $petContent);
+        file_put_contents("$dir_path/veterinarios.php", $veterinarioContent);
         
 
         header("refresh:2; url=login.php");
@@ -170,16 +172,148 @@ function generateProfile($nombre_completo, $apellido, $email, $tipo_usuario, $pa
 HTML;
 }
 
-//Crear la función
+
 function generatePetForm($email, $tipo_usuario, $pais) {
-   return null;
+return <<<HTML
+ <?php
+     require('../../../../config/Database.php');
+     \$database = new Database();
+     \$conn = \$database->getConnection();
+    if (\$_SERVER["REQUEST_METHOD"] == "POST") {
+        \$nombre_mascota = trim(\$_POST['nombre_mascota']);
+        \$tipo_mascota = trim(\$_POST['tipo_mascota']);
+        \$raza_mascota = trim(\$_POST['raza_mascota']);
+        \$edad_mascota = (\$_POST['edad_mascota']);
+        \$caracteristicas_mascota = trim(\$_POST['caracteristicas_mascota']);
+        \$detalles_utiles = trim(\$_POST['detalles_utiles']);
+        \$vacunas = trim(\$_POST['vacunas']);
+        \$fecha_vacunacion = trim(\$_POST['fecha_vacunacion']);
+        
+        if (
+        empty(\$nombre_mascota) || empty(\$tipo_mascota) || empty(\$raza_mascota) || empty(\$edad_mascota) ||
+        empty(\$caracteristicas_mascota) || empty(\$detalles_utiles) || empty(\$vacunas) || empty(\$fecha_vacunacion)
+    ) {
+        die("Por favor, completá todos los campos.");
+    }
+        
+    try {
+        \$sql = "INSERT INTO mascotas (nombre_mascota, tipo_mascota, raza_mascota, edad_mascota, caracteristicas_mascota, detalles_utiles, vacunas, fecha_vacunacion) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        \$stmt = \$conn->prepare(\$sql);
+        \$stmt->execute([
+            \$nombre_mascota,
+            \$tipo_mascota,
+            \$raza_mascota,
+            \$edad_mascota,
+            \$caracteristicas_mascota,
+            \$detalles_utiles,
+            \$vacunas,
+            \$fecha_vacunacion
+        ]);
+
+        header("Location: misMascotas.php?success=1");
+        exit();
+    } catch (PDOException \$e) {
+        die("Error al registrar la mascota: " . \$e->getMessage());
+    }
+}
     
+
+     ?>
+    
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <title>Find My Pet | Registrar Mascota</title>
+    </head>
+    <body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Find My Pet</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="index.php">Inicio</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="perfil.php">Perfil</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="mis_mascotas.php"> Mis Mascotas</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="logout.php">Cerrar Sesion</a>
+        </li>
+    </ul>
+      <span class="navbar-text">
+        $email ($tipo_usuario - $pais)
+      </span>
+    </div>
+  </div>
+</nav>
+
+        <div class="container mt-5">
+            <h2 class="text-center">Registrar una Mascota</h2>
+            <form action="misMascotas.php" method="POST">
+                <div class="mb-3">
+                    <label class="form-label">Nombre de la Mascota</label>
+                    <input class="form-control" type="text" name="nombre_mascota" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Tipo Mascota</label>
+                    <select name="tipo_mascota" required>
+                        <option value="Perro">Perro</option>
+                        <option value="Gato">Gato</option>
+                        <option value="Ave">Ave</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Raza</label>
+                    <input class="form-control" type="text" name="raza_mascota" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Edad</label>
+                    <input type="text" class="form-control" name="edad_mascota" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Características</label>
+                    <textarea class="form-control" name="caracteristicas_mascota" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Detalles Utiles</label>
+                    <textarea class="form-control" name="detalles_utiles" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Vacunas</label>
+                    <textarea class="form-control" name="vacunas" required></textarea>
+                </div>
+                <div class="form-label">Fecha Vacunacion</div>
+                <textarea class="form-control" name="fecha_vacunacion" cols="30" required></textarea>
+                <button type="submit" class="btn btn-success">Registrar Mascota</button>
+            </form>
+        </div>
+    </body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    </html>     
+     
+HTML;
+
+}
+
+//Crear función veterinarios
+generateVeterinario() {
+
 }
 
 ?>
-
-
-
 
 <!DOCTYPE html>
 <html lang="en">
