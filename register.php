@@ -309,7 +309,7 @@ HTML;
 }
 
 //Crear función veterinarios
-generateVeterinario() {
+function generateVeterinario() {
 
 }
 
