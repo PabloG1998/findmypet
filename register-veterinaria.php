@@ -1,9 +1,47 @@
-<?php 
-    require_once('config/Database.php');
-    $database = new Database();
-    $conn = $database->getConnection();
+<?php
+require_once('config/Database.php');
+$database = new Database();
+$conn = $database->getConnection();
 
-    
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $nombre_veterinaria = trim($_POST['nombre_veterinaria']);
+    $telefono = trim($_POST['telefono']);
+    $pais = trim($_POST['pais']);
+    $provincia = trim($_POST['provincia']);
+    $estado = trim($_POST['estado']);
+    $ciudad = trim($_POST['ciudad']);
+    $direccion = trim($_POST['direccion']);
+    $pagina_web = trim($_POST['pagina_web']);
+    $publicidad = isset($_POST['publicidad']) ? 1 : 0;
+
+    if (empty($telefono) || empty($pais) || empty($ciudad) || empty($direccion)) {
+        echo '<div class="p-3 mb-2 bg-danger text-white">Todos los campos con (*) son obligatorios.</div>';
+    } else {
+        try {
+            $sql = "INSERT INTO veterinarias 
+                (nombre_veterinaria, telefono, pais, provincia, estado, ciudad, direccion, pagina_web, publicidad)
+                VALUES 
+                (:nombre_veterinaria, :telefono, :pais, :provincia, :estado, :ciudad, :direccion, :pagina_web, :publicidad)";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([
+                ':nombre_veterinaria' => $nombre_veterinaria,
+                ':telefono'           => $telefono,
+                ':pais'               => $pais,
+                ':provincia'          => $provincia,
+                ':estado'             => $estado,
+                ':ciudad'             => $ciudad,
+                ':direccion'          => $direccion,
+                ':pagina_web'         => $pagina_web,
+                ':publicidad'         => $publicidad
+            ]);
+
+            echo '<div class="p-3 mb-2 bg-success text-white">Veterinaria registrada exitosamente.</div>';
+        } catch (PDOException $e) {
+            echo '<div class="p-3 mb-2 bg-danger text-white">Error: ' . $e->getMessage() . '</div>';
+        }
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -42,14 +80,14 @@
         </div>
 
         <div class="mb-3"> 
-            <label class="form-label">Telefono</label>
+            <label class="form-label">Telefono *</label>
             <input class="form-control" type="text" name="telefono" required>
         </div>
 
         <div class="mb-3">
-            <label class="from-label">Pais</label>
+            <label class="from-label">Pais * </label>
             <select class="form-select" name="pais" required>
-            <option value="ARG">Argentina</option>
+                <option value="ARG">Argentina</option>
                 <option value="BOL">Bolivia</option>
                 <option value="BRA">Brasil</option>
                 <option value="CHL">Chile</option>
@@ -73,32 +111,38 @@
         </div>
     
         <div class="mb-3">
-            <label class="form-label">Provincia/Estado</label>
-            <input type="text" class="form-control" required>
+            <label class="form-label">Provincia (Si su país se rige por este modelo)</label>
+            <input type="text" name= "provincia" class="form-control">
         </div>
-    
+        
         <div class="mb-3">
-            <label class="form-label">Ciudad</label>
-            <input type="text" class="form-control" required>
+            <label class="form-label">Estado (Si su país se rige por este modelo)</label>
+            <input type="text" name="estado" class="form-control">
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Dirección</label>
-            <input type="text" class="form-control" required>
+            <label class="form-label">Ciudad * </label>
+            <input type="text" name="ciudad" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Dirección *</label>
+            <input type="text" name="direccion" class="form-control" required>
         </div>
 
         <div class="mb-3">
             <label class="form-label">Pagina Web (Si la tiene)</label>
-            <input type="text" class="form-control">
+            <input type="text" name="pagina_web" class="form-control">
         </div>
-
+        
         <div class="mb-3">
-            <label class="form-label">¿Quiere publicidad en la pagina?</label>
-            <select class="form-select" name="publicidad">
-                <option value="0">No</option>
+            <label class="form-label">¿Desea publicitarse en esta pagina?</label>
+            <select name="publicidad" class="form-select">
                 <option value="1">Si</option>
+                <option value="0">No</option>
             </select>
         </div>
+
          <button type="submit" class="btn btn-success w-100" >Registrarme</button>   
     </form>
 </div>
