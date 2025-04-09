@@ -308,11 +308,6 @@ HTML;
 
 }
 
-//Crear función veterinarios
-function generateVeterinario() {
-
-}
-
 ?>
 
 <!DOCTYPE html>
@@ -406,6 +401,10 @@ function generateVeterinario() {
             </select>
         </div>
         <button type="submit" class="btn btn-primary w-100">Registrarse</button>
+    </form>
+    <br>
+    <form action="register-veterinaria.php" method="post">
+        <button type="submit" class="btn btn-danger w-100">Registrar Veterinaria</button>
     </form>
 </div>
 
