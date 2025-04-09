@@ -13,8 +13,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $provincia_estado = trim($_POST['provincia_estado']);
     $direccion = trim($_POST['direccion']);
     $telefono = trim($_POST['telefono']);
+    $ciudad = trim($_POST['ciudad']);
 
-    if (empty($nombre_completo) || empty($apellido) || empty($email) || empty($_POST['password']) || empty($pais) || empty($tipo_usuario) || empty($telefono)) {
+    if (empty($nombre_completo) || empty($apellido) || empty($email) || empty($_POST['password']) || empty($pais) || empty($tipo_usuario) || empty($telefono) || empty($ciudad)) {
         die("Todos los campos obligatorios deben ser completados.");
     }
 
@@ -24,21 +25,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("El correo ya está registrado.");
     }
 
-    $sql = "INSERT INTO usuarios (nombre_completo, apellido, email, password, pais, provincia_estado, direccion, telefono, tipo_usuario) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO usuarios (nombre_completo, apellido, email, password, pais, provincia_estado, direccion, telefono, tipo_usuario, ciudad) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
     
-    if ($stmt->execute([$nombre_completo, $apellido, $email, $password, $pais, $provincia_estado, $direccion, $telefono, $tipo_usuario])) {
+    if ($stmt->execute([$nombre_completo, $apellido, $email, $password, $pais, $provincia_estado, $direccion, $telefono, $tipo_usuario, $ciudad])) {
 
         $dir_path = crearCarpetaUsuario($pais, $tipo_usuario, $email);
         $indexContent = generateIndex($email, $tipo_usuario, $pais);
         $profileContent = generateProfile($nombre_completo, $apellido, $email, $tipo_usuario, $pais);
         $petContent = generatePetForm($email, $tipo_usuario, $pais);
         $veterinarioContent = generateVeterinario();
+        $perdidaContent = generateLostForm();
         file_put_contents("$dir_path/index.php", $indexContent);
         file_put_contents("$dir_path/perfil.php", $profileContent);
         file_put_contents("$dir_path/misMascotas.php", $petContent);
         file_put_contents("$dir_path/veterinarios.php", $veterinarioContent);
+        file_put_contents("$dir_path/denunciarPerdida.php", $perdidaContent);
         
 
         header("refresh:2; url=login.php");
@@ -73,23 +76,23 @@ function generateIndex($email, $tipo_usuario, $pais) {
     switch ($tipo_usuario) {
         case 'Dueño':
             $menuItems = '<li class="nav-item"><a class="nav-link" href="misMascotas.php">Mis Mascotas</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">Veterinarios</a></li>
+            <li class="nav-item"><a class="nav-link" href="veterinarios.php">Veterinarios</a></li>
             <li class="nav-item"><a class="nav-link" href="#">Reportar Perdida</a></li>';
             break;
         case 'Adoptante':
             $menuItems = '<li class="nav-item"><a class="nav-link" href="#">Mascotas Disponibles</a>
             </li><li class="nav-item"><a class="nav-link" href="#">Mi historial de Adopcion</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">Veterinarios</a></li>';
+            <li class="nav-item"><a class="nav-link" href="veterinarios.php">Veterinarios</a></li>';
             break;
         case 'Rescatista':
             $menuItems = '<li class="nav-item"><a class="nav-link" href="#">Registrar Rescate</a></li>
             <li class="nav-item"><a class="nav-link" href="#">Lista de Mascotas Rescatadas</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">Veterinarios</a></li>';
+            <li class="nav-item"><a class="nav-link" href="veterinarios.php">Veterinarios</a></li>';
             break;
         case 'Transito':
             $menuItems = '<li class="nav-item"><a class="nav-link" href="#">Mascotas en Tránsito</a></li>
             <li class="nav-item"><a class="nav-link" href="#">Solicitudes de Adopcion</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">Veterinarios</a></li>';
+            <li class="nav-item"><a class="nav-link" href="veterinarios.php">Veterinarios</a></li>';
             break;
         default:
             $menuItems = '<li class="nav-item">
@@ -127,6 +130,10 @@ function generateIndex($email, $tipo_usuario, $pais) {
 </html>
 HTML;
 }
+//Formulario para denunciar una pérdida de un animal
+function generateLostForm() {
+  return null;
+}
 
 function generateProfile($nombre_completo, $apellido, $email, $tipo_usuario, $pais) {
     return <<<HTML
@@ -154,7 +161,10 @@ function generateProfile($nombre_completo, $apellido, $email, $tipo_usuario, $pa
           <a class="nav-link active" href="perfil.php">Perfil</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="mis_mascotas.php"> Mis Mascotas</a>
+          <a class="nav-link" href="misMascotas.php"> Mis Mascotas</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="denunciarPerdida.php">Denunciar Perdida</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="logout.php">Cerrar Sesion</a>
@@ -167,6 +177,146 @@ function generateProfile($nombre_completo, $apellido, $email, $tipo_usuario, $pa
   </div>
 </nav>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+HTML;
+}
+
+function generateVeterinario() {
+  return <<<HTML
+<?php
+  session_start();
+  require_once('../../../../config/Database.php');
+
+  \$database = new Database();
+  \$conn = \$database->getConnection();
+
+  \$user_id = \$_SESSION['user_id'] ?? null;
+  if (!\$user_id) {
+      die("Acceso Denegado, se debe iniciar sesión");
+  }
+
+  // Obtener los datos del usuario actual
+  \$stmt = \$conn->prepare("SELECT pais, provincia_estado, ciudad FROM usuarios WHERE id = :id");
+  \$stmt->execute([':id' => \$user_id]);
+  \$user = \$stmt->fetch(PDO::FETCH_ASSOC);
+
+  if (!\$user) {
+      die("Usuario no encontrado");
+  }
+
+  \$pais_usuario = \$user['pais'];
+  \$provincia_estado_usuario = \$user['provincia_estado'];
+  \$ciudad_usuario = \$user['ciudad'];
+
+  // Buscar veterinarias que coincidan con los datos del usuario
+  \$stmt = \$conn->prepare("
+      SELECT * FROM veterinarias 
+      WHERE pais = :pais 
+      AND ciudad = :ciudad 
+      AND (provincia = :provincia_estado OR estado = :provincia_estado)
+  ");
+
+  \$stmt->execute([
+      ':pais' => \$pais_usuario,
+      ':provincia_estado' => \$provincia_estado_usuario,
+      ':ciudad' => \$ciudad_usuario,
+  ]);
+
+  \$veterinarias = \$stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Find My Pet | Veterinarias</title>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Find My Pet</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="../index.php">Inicio</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="perfil.php">Perfil</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="misMascotas.php"> Mis Mascotas</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="denunciarPerdida.php">Denunciar Perdida</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="logout.php">Cerrar Sesion</a>
+        </li>
+    </ul>
+      <span class="navbar-text">
+        $email ($tipo_usuario - $pais)
+      </span>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Veterinarias</h2>
+
+  <?php if (!empty(\$veterinarias)): ?>
+    <table class="table table-bordered table-striped" id="tabla-veterinarias">
+      <thead class="table-dark">
+        <tr>
+          <th>Nombre</th>
+          <th>Teléfono</th>
+          <th>Dirección</th>
+          <th>Página Web</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php foreach (\$veterinarias as \$v): ?>
+          <tr>
+            <td><?= htmlspecialchars(\$v['nombre_veterinaria']) ?></td>
+            <td><?= htmlspecialchars(\$v['telefono']) ?></td>
+            <td><?= htmlspecialchars(\$v['direccion']) ?></td>
+            <td>
+              <?php if (!empty(\$v['pagina_web'])): ?>
+                <a class="btn btn-danger" href="<?= htmlspecialchars(\$v['pagina_web']) ?>" target="_blank">Ver Web</a>
+              <?php else: ?>
+                No disponible
+              <?php endif; ?>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+      </tbody>
+    </table>
+  <?php else: ?>
+    <div class="alert alert-warning text-center">
+      No se encontraron veterinarias en la zona
+    </div>
+  <?php endif; ?>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script>
+  \$(document).ready(function () {
+    \$('#tabla-veterinarias').DataTable({
+      language: {
+        url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+      }
+    });
+  });
+</script>
+
 </body>
 </html>
 HTML;
@@ -247,9 +397,12 @@ return <<<HTML
           <a class="nav-link active" href="perfil.php">Perfil</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="mis_mascotas.php"> Mis Mascotas</a>
+          <a class="nav-link" href="misMascotas.php"> Mis Mascotas</a>
         </li>
         <li class="nav-item">
+          <a class="nav-link" href="denunciarPerdida.php">Denunciar Perdida</a>
+        </li>
+         <li class="nav-item">
             <a class="nav-link" href="logout.php">Cerrar Sesion</a>
         </li>
     </ul>
@@ -378,6 +531,10 @@ HTML;
         <div class="mb-3">
             <label class="form-label">Dirección (Opcional)</label>
             <input type="text" name="direccion" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Ciudad</label>
+          <input type="text" name="ciudad" class="form-control" required>
         </div>
         <div class="mb-3">
             <label class="form-label">Email</label>
