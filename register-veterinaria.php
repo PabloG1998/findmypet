@@ -1,48 +1,48 @@
-<?php
+<?php 
 require_once('config/Database.php');
 $database = new Database();
 $conn = $database->getConnection();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nombre_veterinaria = trim($_POST['nombre_veterinaria']);
-    $telefono = trim($_POST['telefono']);
-    $pais = trim($_POST['pais']);
-    $provincia = trim($_POST['provincia']);
-    $estado = trim($_POST['estado']);
-    $ciudad = trim($_POST['ciudad']);
-    $direccion = trim($_POST['direccion']);
-    $pagina_web = trim($_POST['pagina_web']);
-    $publicidad = isset($_POST['publicidad']) ? 1 : 0;
+    $nombre_veterinaria = isset($_POST['nombre_veterinaria']) ? trim($_POST['nombre_veterinaria']) : '';
+    $telefono = isset($_POST['telefono']) ? trim($_POST['telefono']) : '';
+    $pais = isset($_POST['pais']) ? trim($_POST['pais']) : '';
+    $provincia = isset($_POST['provincia']) ? trim($_POST['provincia']) : '';
+    $estado = isset($_POST['estado']) ? trim($_POST['estado']) : '';
+    $ciudad = isset($_POST['ciudad']) ? trim($_POST['ciudad']) : '';
+    $direccion = isset($_POST['direccion']) ? trim($_POST['direccion']) : '';
+    $pagina_web = isset($_POST['pagina_web']) ? trim($_POST['pagina_web']) : '';
+    $publicidad = isset($_POST['publicidad']) ? trim($_POST['publicidad']) : '';
 
     if (empty($telefono) || empty($pais) || empty($ciudad) || empty($direccion)) {
         echo '<div class="p-3 mb-2 bg-danger text-white">Todos los campos con (*) son obligatorios.</div>';
     } else {
-        try {
-            $sql = "INSERT INTO veterinarias 
-                (nombre_veterinaria, telefono, pais, provincia, estado, ciudad, direccion, pagina_web, publicidad)
-                VALUES 
-                (:nombre_veterinaria, :telefono, :pais, :provincia, :estado, :ciudad, :direccion, :pagina_web, :publicidad)";
+        $sql = "INSERT INTO veterinarias (nombre_veterinaria, telefono, pais, provincia, estado, ciudad, direccion, pagina_web, publicidad) 
+                VALUES (:nombre_veterinaria, :telefono, :pais, :provincia, :estado, :ciudad, :direccion, :pagina_web, :publicidad)";
+        $stmt = $conn->prepare($sql);
 
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([
-                ':nombre_veterinaria' => $nombre_veterinaria,
-                ':telefono'           => $telefono,
-                ':pais'               => $pais,
-                ':provincia'          => $provincia,
-                ':estado'             => $estado,
-                ':ciudad'             => $ciudad,
-                ':direccion'          => $direccion,
-                ':pagina_web'         => $pagina_web,
-                ':publicidad'         => $publicidad
-            ]);
+        $params = [
+            ':nombre_veterinaria' => $nombre_veterinaria,
+            ':telefono' => $telefono,
+            ':pais' => $pais,
+            ':provincia' => $provincia,
+            ':estado' => $estado,
+            ':ciudad' => $ciudad,
+            ':direccion' => $direccion,
+            ':pagina_web' => $pagina_web,
+            ':publicidad' => $publicidad
+        ];
 
+        if ($stmt->execute($params)) {
             echo '<div class="p-3 mb-2 bg-success text-white">Veterinaria registrada exitosamente.</div>';
-        } catch (PDOException $e) {
-            echo '<div class="p-3 mb-2 bg-danger text-white">Error: ' . $e->getMessage() . '</div>';
+        } else {
+            echo '<div class="p-3 mb-2 bg-danger text-white">Error al registrar la veterinaria.</div>';
         }
     }
 }
 ?>
+
+
 
 <!DOCTYPE html>
 <html lang="es">
